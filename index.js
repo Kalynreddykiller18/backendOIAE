@@ -9,6 +9,10 @@ const port = process.env.PORT || 3001;
 app.use(bodyParser.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+    res.send({ hii: "Kalyan Reddy Bejjanki" });
+});
+
 app.post("/send-mail", (req, res) => {
     const { to, subject, text } = req.body;
 
