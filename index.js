@@ -17,15 +17,17 @@ app.post("/send-mail", (req, res) => {
     const { to, subject, text } = req.body;
 
     const mailTransporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.zoho.com",
+        port: 465,
+        secure: true, // Use SSL
         auth: {
-            user: "praveen123kalyan@gmail.com",
-            pass: "ezin suif bwye uxrt",
+            user: "accounts@oiaes.com",
+            pass: "8Tutbury@8",
         },
     });
 
     const mailOptions = {
-        from: "praveen123kalyan@gmail.com",
+        from: "accounts@oiaes.com",
         to,
         subject,
         text,
