@@ -21,13 +21,13 @@ app.post("/send-mail", (req, res) => {
         port: 465,
         secure: true, // Use SSL
         auth: {
-            user: "accounts@oiaes.com",
-            pass: "8Tutbury@8",
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
         },
     });
 
     const mailOptions = {
-        from: "accounts@oiaes.com",
+        from: process.env.EMAIL,
         to,
         subject,
         text,
