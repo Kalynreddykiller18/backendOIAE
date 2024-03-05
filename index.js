@@ -7,18 +7,42 @@ const mongo = require("mongodb");
 require("dotenv").config();
 const { AppConfigurationClient } = require("@azure/app-configuration");
 
-async function loadVar() {
-    const connString =
-        "Endpoint=https://weappconfig.azconfig.io;Id=iPvS;Secret=mt28hZcPXOtaom9cVohvleypJYOyQ4LnGpgqwH6qOWc=";
-    const client = new AppConfigurationClient(connString);
+const connectionString =
+    "Endpoint=https://weappconfig.azconfig.io;Id=iPvS;Secret=mt28hZcPXOtaom9cVohvleypJYOyQ4LnGpgqwH6qOWc=";
 
-    const mail = await client.getConfigurationSetting({ key: "EMAIL" });
-    console.log(mail);
+const client = new AppConfigurationClient(connectionString);
+
+// Define an array of keys you want to fetch
+// const keys = ["EMAIL", "PASSWORD"];
+// Function to fetch all key-value pairs and feature flags
+async function fetchAllConfigurations() {
+    const configurations = {};
+    const settings = client.listConfigurationSettings();
+    for await (const setting of settings) {
+        configurations[setting.key] = setting.value;
+    }
+    return configurations;
 }
 
-loadVar().catch((err) => {
-    console.log("Error fetching configuration file:", err);
-});
+// Call the function to fetch all configurations
+
+var email = "";
+var password = "";
+var featur = {};
+var ft = false;
+fetchAllConfigurations()
+    .then((configurations) => {
+        email = configurations["EMAIL"];
+        password = configurations["PASSWORD"];
+        featur = configurations[".appconfig.featureflag/MyFeatureFlag"];
+        const nonjson = JSON.parse(featur);
+        ft = nonjson["enabled"];
+    })
+    .catch((error) => {
+        console.error("Error fetching configurations:", error);
+    });
+
+console.log(featur);
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -29,6 +53,14 @@ app.use(cors());
 
 app.get("/", (req, res) => {
     res.send({ hii: "Kalyan Reddy Bejjanki" });
+});
+
+app.get("/new", (req, res) => {
+    if (ft) {
+        res.send({ Hello: "New" });
+    } else {
+        res.send({ Hello: "Old" });
+    }
 });
 
 app.use("/querie", require("./routes/queries"));
@@ -55,13 +87,13 @@ app.post("/send-mail", (req, res) => {
         port: 465,
         secure: true, // Use SSL
         auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD,
+            user: email,
+            pass: password,
         },
     });
 
     const mailOptions = {
-        from: process.env.EMAIL,
+        from: email,
         to,
         subject,
         text,
