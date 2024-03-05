@@ -5,6 +5,20 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const mongo = require("mongodb");
 require("dotenv").config();
+const { AppConfigurationClient } = require("@azure/app-configuration");
+
+async function loadVar() {
+    const connString =
+        "Endpoint=https://weappconfig.azconfig.io;Id=iPvS;Secret=mt28hZcPXOtaom9cVohvleypJYOyQ4LnGpgqwH6qOWc=";
+    const client = new AppConfigurationClient(connString);
+
+    const mail = await client.getConfigurationSetting({ key: "EMAIL" });
+    console.log(mail);
+}
+
+loadVar().catch((err) => {
+    console.log("Error fetching configuration file:", err);
+});
 
 const app = express();
 const port = process.env.PORT || 3001;
