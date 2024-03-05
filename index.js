@@ -58,6 +58,8 @@ app.post("/send-mail", (req, res) => {
             return res.status(500).send(error.toString());
         }
 
+        console.log("Mail sent successfully");
+
         res.status(200).send("Email sent: " + info.response);
     });
 });
